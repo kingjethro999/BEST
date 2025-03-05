@@ -42,27 +42,20 @@ export default function Home() {
   useEffect(() => {
     Prism.highlightAll();
     initializeTheme();
-    loadChatSessions();
+const loadChatSessions = async () => {
+  try {
+    const sessions = await chatDB.getAllSessions();
+    setChatSessions(sessions);
+  } catch (err) {
+    console.error('Failed to load chat sessions:', err);
+  }
+};
+
+loadChatSessions();
   }, []);
 
-  useEffect(() => {
-    if (currentChatId && messages.length > 0) {
-      saveChatSession();
-    }
-  }, [messages, currentChatId]);
-
-  const loadChatSessions = async () => {
-    try {
-      const sessions = await chatDB.getAllSessions();
-      // Sort sessions by updatedAt timestamp in descending order
-      const sortedSessions = sessions.sort((a, b) => b.updatedAt - a.updatedAt);
-      setChatSessions(sortedSessions);
-    } catch (err) {
-      console.error('Failed to load chat sessions:', err);
-    }
-  };
-
-  const saveChatSession = async () => {
+  // Memoize the saveChatSession function with useCallback
+  const saveChatSession = useCallback(async () => {
     if (!currentChatId) return;
 
     try {
@@ -74,11 +67,19 @@ export default function Home() {
         updatedAt: Date.now()
       };
       await chatDB.saveSession(session);
-      loadChatSessions(); // Refresh the list
+      const sessions = await chatDB.getAllSessions();
+      setChatSessions(sessions);
     } catch (err) {
       console.error('Failed to save chat session:', err);
     }
-  };
+  }, [currentChatId, messages]);
+
+  // Add saveChatSession to the dependency array
+  useEffect(() => {
+    if (currentChatId && messages.length > 0) {
+      saveChatSession();
+    }
+  }, [messages, currentChatId, saveChatSession]);
 
   const loadChatSession = async (sessionId: string) => {
     try {
@@ -99,7 +100,8 @@ export default function Home() {
       if (sessionId === currentChatId) {
         handleNewChat();
       }
-      loadChatSessions();
+      const sessions = await chatDB.getAllSessions();
+      setChatSessions(sessions);
     } catch (err) {
       console.error('Failed to delete chat session:', err);
     }
@@ -225,7 +227,7 @@ export default function Home() {
 
     try {
       setUploadedFiles(prev => [...prev, file]);
-    } catch (_err) {
+    } catch (error) {
       setError('Failed to process file');
     }
   };
