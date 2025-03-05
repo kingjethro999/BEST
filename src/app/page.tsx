@@ -206,7 +206,15 @@ export default function Home() {
 
       if (!response.ok) {
         const errorData: ChatError = await response.json();
-        throw new Error(errorData.message || 'Failed to get response');
+        const errorMessage = errorData.message || errorData.error || 'Failed to get response';
+        
+        // Add error message to chat
+        const errorAssistantMessage: Message = {
+          role: 'assistant',
+          content: `⚠️ Error: ${errorMessage}\n\nPlease try again. If the problem persists, check your internet connection or try again later.`
+        };
+        setMessages(prev => [...prev, errorAssistantMessage]);
+        throw new Error(errorMessage);
       }
 
       const data: ChatResponse = await response.json();
@@ -218,6 +226,14 @@ export default function Home() {
 
     } catch (err) {
       console.error('Chat submission error:', err);
+      // Only add error message if it wasn't already added in the response.ok check
+      if (err instanceof Error && !err.message.includes('Failed to get response')) {
+        const errorAssistantMessage: Message = {
+          role: 'assistant',
+          content: `⚠️ Error: An unexpected error occurred.\n\nPlease try again. If the problem persists, check your internet connection or try again later.`
+        };
+        setMessages(prev => [...prev, errorAssistantMessage]);
+      }
     } finally {
       setIsLoading(false);
     }
