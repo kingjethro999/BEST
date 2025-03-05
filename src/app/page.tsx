@@ -20,12 +20,13 @@ import 'prismjs/components/prism-json';
 import 'prismjs/components/prism-markdown';
 import 'prismjs/components/prism-latex';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Message, ChatResponse, ChatError } from '@/types/chat';
 import { apiConfig } from '@/config/api';
 import { FileHandler } from '@/utils/fileHandler';
 import { chatDB, ChatSession } from '@/utils/db';
 import Sidebar from '@/components/Sidebar';
+import Image from 'next/image';
 
 export default function Home() {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -224,7 +225,7 @@ export default function Home() {
 
     try {
       setUploadedFiles(prev => [...prev, file]);
-    } catch (err) {
+    } catch (_err) {
       setError('Failed to process file');
     }
   };
@@ -262,7 +263,7 @@ export default function Home() {
           <div className="p-4 space-y-4 pb-32 h-full">
             {messages.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full min-h-[calc(100vh-200px)] text-center text-gray-600 dark:text-gray-300 space-y-4">
-              <img src="/favicon.ico" alt="BEST" className="w-32 h-32 mb-4" />
+              <Image src="/favicon.ico" alt="BEST" width={128} height={128} className="mb-4" />
               <h3 className="text-xl font-semibold">Hey there! 👋</h3>
               <p className="text-lg">Get started with BEST</p>
               <div className="space-y-2">
@@ -311,7 +312,7 @@ export default function Home() {
                       // Check for code blocks
                       if (line.startsWith('```')) {
                         const lang = line.slice(3).trim();
-                        let codeContent = [];
+                        const codeContent = [];
                         let j = i + 1;
                         
                         // Collect all lines until closing ```

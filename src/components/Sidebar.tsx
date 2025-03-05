@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { ChatSession } from '@/utils/db';
+import Image from 'next/image';
 
 interface SidebarProps {
   isVisible: boolean;
@@ -79,7 +80,7 @@ export default function Sidebar({
     >
       <div className="flex justify-between items-center p-1 bg-white dark:bg-gray-800 text-gray-900 dark:text-white border-b border-gray-200 dark:border-gray-700">
         <div className="flex items-center">
-          <img src="/favicon.ico" alt="BEST" className="w-16 h-16" />
+          <Image src="/favicon.ico" alt="BEST" width={64} height={64} />
         </div>
         <div className="flex items-center space-x-2">
           <button
@@ -147,7 +148,7 @@ export default function Sidebar({
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {chatSessions.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-center text-gray-500 dark:text-gray-400 space-y-6">
-            <img src="/favicon.ico" alt="BEST" className="w-32 h-32 mb-4" />
+            <Image src="/favicon.ico" alt="BEST" width={128} height={128} className="mb-4" />
             <p>Start a new chat!</p>
           </div>
         ) : (
