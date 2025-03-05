@@ -32,27 +32,77 @@ export default function Home() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [currentChatId, setCurrentChatId] = useState<string | null>(null);
 
   const [isSidebarVisible, setIsSidebarVisible] = useState(true);
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
   const [chatSessions, setChatSessions] = useState<ChatSession[]>([]);
 
+  // Theme management
+  const [theme, setTheme] = useState<'light' | 'dark' | 'system'>('system');
+
+  // Initialize theme on component mount
   useEffect(() => {
     Prism.highlightAll();
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'light' || savedTheme === 'dark' || savedTheme === 'system') {
+      setTheme(savedTheme);
+    }
     initializeTheme();
-const loadChatSessions = async () => {
-  try {
-    const sessions = await chatDB.getAllSessions();
-    setChatSessions(sessions);
-  } catch (err) {
-    console.error('Failed to load chat sessions:', err);
-  }
-};
 
-loadChatSessions();
+    const loadChatSessions = async () => {
+      try {
+        const sessions = await chatDB.getAllSessions();
+        setChatSessions(sessions);
+      } catch (err) {
+        console.error('Failed to load chat sessions:', err);
+      }
+    };
+
+    loadChatSessions();
   }, []);
+
+  // Theme initialization function
+  const initializeTheme = () => {
+    const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+    if (theme === 'system') {
+      document.documentElement.classList.toggle('dark', systemPrefersDark);
+    } else {
+      document.documentElement.classList.toggle('dark', theme === 'dark');
+    }
+
+    // Listen for system theme changes
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const handleThemeChange = (e: MediaQueryListEvent) => {
+      if (theme === 'system') {
+        document.documentElement.classList.toggle('dark', e.matches);
+      }
+    };
+
+    mediaQuery.addEventListener('change', handleThemeChange);
+    return () => {
+      mediaQuery.removeEventListener('change', handleThemeChange);
+    };
+  };
+
+  // Theme toggle function
+  const toggleTheme = () => {
+    const themeOrder: Array<'light' | 'dark' | 'system'> = ['light', 'dark', 'system'];
+    const currentIndex = themeOrder.indexOf(theme);
+    const newTheme = themeOrder[(currentIndex + 1) % themeOrder.length];
+
+    setTheme(newTheme);
+    localStorage.setItem('theme', newTheme);
+
+    // Apply theme immediately
+    const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    if (newTheme === 'system') {
+      document.documentElement.classList.toggle('dark', systemPrefersDark);
+    } else {
+      document.documentElement.classList.toggle('dark', newTheme === 'dark');
+    }
+  };
 
   // Memoize the saveChatSession function with useCallback
   const saveChatSession = useCallback(async () => {
@@ -107,50 +157,6 @@ loadChatSessions();
     }
   };
 
-  const initializeTheme = () => {
-    const savedTheme = localStorage.getItem('theme') || 'system';
-    const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-
-    if (savedTheme === 'system') {
-      document.documentElement.classList.toggle('dark', systemPrefersDark);
-    } else {
-      document.documentElement.classList.toggle('dark', savedTheme === 'dark');
-    }
-
-    // Listen for system theme changes
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    mediaQuery.addEventListener('change', (e) => {
-      if (localStorage.getItem('theme') === 'system') {
-        document.documentElement.classList.toggle('dark', e.matches);
-      }
-    });
-  };
-
-  const toggleTheme = () => {
-    const currentTheme = localStorage.getItem('theme') || 'system';
-    let newTheme;
-
-    switch (currentTheme) {
-      case 'light':
-        newTheme = 'dark';
-        break;
-      case 'dark':
-        newTheme = 'system';
-        break;
-      default: // system or any other value
-        newTheme = 'light';
-    }
-
-    localStorage.setItem('theme', newTheme);
-
-    if (newTheme === 'system') {
-      const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      document.documentElement.classList.toggle('dark', systemPrefersDark);
-    } else {
-      document.documentElement.classList.toggle('dark', newTheme === 'dark');
-    }
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!input.trim() && uploadedFiles.length === 0) return;
@@ -169,7 +175,6 @@ loadChatSessions();
     setMessages(prev => [...prev, userMessage]);
     setInput('');
     setIsLoading(true);
-    setError(null);
 
     try {
       // Process files first
@@ -212,7 +217,7 @@ loadChatSessions();
       setUploadedFiles([]);
 
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
+      console.error('Chat submission error:', err);
     } finally {
       setIsLoading(false);
     }
@@ -221,14 +226,14 @@ loadChatSessions();
   const handleFileUpload = async (file: File) => {
     const validation = FileHandler.validateFile(file);
     if (!validation.isValid) {
-      setError(validation.error || 'Invalid file');
+      console.error(validation.error || 'Invalid file');
       return;
     }
 
     try {
       setUploadedFiles(prev => [...prev, file]);
     } catch (error) {
-      setError('Failed to process file');
+      console.error('Failed to process file');
     }
   };
 
@@ -239,12 +244,20 @@ loadChatSessions();
 
   const handleNewChat = () => {
     setMessages([]);
-    setError(null);
     setCurrentChatId(null);
   };
 
   return (
     <div className="flex h-screen overflow-hidden bg-white dark:bg-gray-900">
+      {/* Theme Toggle Button */}
+      <button 
+        onClick={toggleTheme} 
+        className="fixed top-4 right-4 z-50 p-2 bg-gray-200 dark:bg-gray-700 rounded-full shadow-md"
+        aria-label="Toggle Theme"
+      >
+        {theme === 'light' ? '🌞' : theme === 'dark' ? '🌙' : '💻'}
+      </button>
+
       <Sidebar
         isVisible={isSidebarVisible}
         onToggle={() => setIsSidebarVisible(!isSidebarVisible)}
@@ -254,6 +267,7 @@ loadChatSessions();
         onSelectChat={loadChatSession}
         onDeleteChat={deleteChatSession}
       />
+      
       <main className="flex-1 flex flex-col overflow-hidden relative">
         <header className="flex justify-between items-center p-4 bg-white dark:bg-gray-800 text-gray-900 dark:text-white border-b border-gray-200 dark:border-gray-700 sticky top-0">
           <div className="flex-1"></div>
@@ -289,7 +303,7 @@ loadChatSessions();
                 </p>
                 <p className="flex items-center justify-center space-x-2">
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.176 0l-3.976 2.888c-.783.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.176 0l-3.976 2.888c-.783.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
                   </svg>
                   <span><strong>T</strong>echnology</span>
                 </p>
@@ -373,11 +387,6 @@ loadChatSessions();
               {isLoading && (
                 <div className="flex justify-center">
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
-                </div>
-              )}
-              {error && (
-                <div className="text-red-500 dark:text-red-400 text-center">
-                  {error}
                 </div>
               )}
             </div>

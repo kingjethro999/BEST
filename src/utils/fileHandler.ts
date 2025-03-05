@@ -105,7 +105,7 @@ export class FileHandler {
     if (file.size > this.MAX_SIZE) {
       return {
         isValid: false,
-        error: 'File size exceeds 10MB limit.'
+        error: 'File size exceeds 150MB limit.'
       };
     }
 
