@@ -27,11 +27,6 @@ export default function Sidebar({
   const sidebarRef = useRef<HTMLDivElement>(null);
   const isResizing = useRef(false);
 
-  const toggleTheme = () => {
-    const newTheme = document.documentElement.classList.contains('dark') ? 'light' : 'dark';
-    document.documentElement.classList.toggle('dark');
-    localStorage.setItem('theme', newTheme);
-  };
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -83,26 +78,7 @@ export default function Sidebar({
           <Image src="/favicon.ico" alt="BEST" width={64} height={64} />
         </div>
         <div className="flex items-center space-x-2">
-          <button
-            onClick={toggleTheme}
-            className="p-1 hover:bg-blue-700 dark:hover:bg-blue-600 rounded"
-            title="Toggle Theme"
-          >
-            <svg
-              className="w-6 h-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
-              />
-            </svg>
-          </button>
+
           <button
             onClick={onNewChat}
             className="p-1 hover:bg-blue-700 dark:hover:bg-blue-600 rounded"
