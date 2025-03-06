@@ -7,8 +7,7 @@ interface ApiConfig {
 const isBrowser = typeof window !== 'undefined';
 
 export const apiConfig: ApiConfig = {
-  openRouterApiKey: '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',
+  openRouterApiKey: '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',
   siteUrl: isBrowser ? window.location.origin : process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000',
   siteName: process.env.NEXT_PUBLIC_SITE_NAME || 'AI Chat Dashboard'
 };
-  

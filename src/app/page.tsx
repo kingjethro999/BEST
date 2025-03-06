@@ -29,10 +29,21 @@ import Sidebar from '@/components/Sidebar';
 import Image from 'next/image';
 
 export default function Home() {
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [messages, setMessages] = useState<Message[]>(() => {
+    if (typeof window !== 'undefined') {
+      const savedMessages = localStorage.getItem('currentMessages');
+      return savedMessages ? JSON.parse(savedMessages) : [];
+    }
+    return [];
+  });
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [currentChatId, setCurrentChatId] = useState<string | null>(null);
+  const [currentChatId, setCurrentChatId] = useState<string | null>(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('currentChatId');
+    }
+    return null;
+  });
 
   const [isSidebarVisible, setIsSidebarVisible] = useState(true);
   const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
@@ -128,6 +139,8 @@ export default function Home() {
   useEffect(() => {
     if (currentChatId && messages.length > 0) {
       saveChatSession();
+      localStorage.setItem('currentMessages', JSON.stringify(messages));
+      localStorage.setItem('currentChatId', currentChatId);
     }
   }, [messages, currentChatId, saveChatSession]);
 
@@ -261,6 +274,8 @@ export default function Home() {
   const handleNewChat = () => {
     setMessages([]);
     setCurrentChatId(null);
+    localStorage.removeItem('currentMessages');
+    localStorage.removeItem('currentChatId');
   };
 
   return (
