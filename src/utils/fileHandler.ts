@@ -98,7 +98,7 @@ export class FileHandler {
     if (!this.ALLOWED_TYPES.includes(file.type)) {
       return {
         isValid: false,
-        error: 'Invalid file type. Only .txt, .md, and .csv files are allowed.'
+        error: 'Invalid file type. Only text-based files are allowed.'
       };
     }
 

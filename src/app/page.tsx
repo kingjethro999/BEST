@@ -180,7 +180,7 @@ export default function Home() {
 
     const userMessage: Message = {
       role: 'user',
-      content: input.trim() + (uploadedFiles.length > 0 ? '\n\nFiles attached: ' + 
+      content: input.trim() + (uploadedFiles.length > 0 ? '\n\nFiles attached: ' +
         uploadedFiles.map(file => `${file.name}`).join(', ')
         : '')
     };
@@ -208,11 +208,11 @@ export default function Home() {
         },
         body: JSON.stringify({
           model: 'deepseek/deepseek-r1:free',
-          messages: [...messages, userMessage, 
-            ...fileContents.map(file => ({
-              role: 'user',
-              content: `Content of ${file.name}:\n${file.content}`
-            }))
+          messages: [...messages, userMessage,
+          ...fileContents.map(file => ({
+            role: 'user',
+            content: `Content of ${file.name}:\n${file.content}`
+          }))
           ]
         })
       });
@@ -220,7 +220,7 @@ export default function Home() {
       if (!response.ok) {
         const errorData: ChatError = await response.json();
         const errorMessage = errorData.message || errorData.error || 'Failed to get response';
-        
+
         // Add error message to chat
         const errorAssistantMessage: Message = {
           role: 'assistant',
@@ -281,8 +281,8 @@ export default function Home() {
   return (
     <div className="flex h-screen overflow-hidden bg-white dark:bg-gray-900">
       {/* Theme Toggle Button */}
-      <button 
-        onClick={toggleTheme} 
+      <button
+        onClick={toggleTheme}
         className="fixed top-4 right-4 z-50 p-2 bg-gray-200 dark:bg-gray-700 rounded-full shadow-md"
         aria-label="Toggle Theme"
       >
@@ -298,200 +298,238 @@ export default function Home() {
         onSelectChat={loadChatSession}
         onDeleteChat={deleteChatSession}
       />
-      
+
       <main className="flex-1 flex flex-col overflow-hidden relative">
-        <header className="flex justify-between items-center p-4 bg-white dark:bg-gray-800 text-gray-900 dark:text-white border-b border-gray-200 dark:border-gray-700 sticky top-0">
+        <header className="flex justify-between items-center p-4 bg-white dark:bg-gray-800 text-gray-900 dark:text-white border-b border-gray-200 dark:border-gray-700 sticky top-0 w-full">
           <div className="flex-1"></div>
           <h1 className="text-2xl font-bold flex-1 text-center">BEST</h1>
           <div className="flex-1"></div>
         </header>
 
         <div className="flex-1 overflow-y-auto bg-gray-50 dark:bg-gray-800">
-          <div className="p-4 space-y-4 pb-32 h-full">
-            {messages.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-full min-h-[calc(100vh-200px)] text-center text-gray-600 dark:text-gray-300 space-y-4">
-              <Image src="/favicon.ico" alt="BEST" width={128} height={128} className="mb-4" />
-              <h3 className="text-xl font-semibold">Hey there! 👋</h3>
-              <p className="text-lg">Get started with BEST</p>
-              <div className="space-y-2">
-                <p className="flex items-center justify-center space-x-2">
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                  </svg>
-                  <span><strong>B</strong>eyond</span>
-                </p>
-                <p className="flex items-center justify-center space-x-2">
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                  </svg>
-                  <span><strong>E</strong>fficient</span>
-                </p>
-                <p className="flex items-center justify-center space-x-2">
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
-                  </svg>
-                  <span><strong>S</strong>mart</span>
-                </p>
-                <p className="flex items-center justify-center space-x-2">
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.176 0l-3.976 2.888c-.783.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
-                  </svg>
-                  <span><strong>T</strong>echnology</span>
-                </p>
-              </div>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {messages.map((message, index) => (
-                <div
-                  key={index}
-                  className={`p-4 rounded-lg ${
-                    message.role === 'user'
-                      ? 'bg-blue-100 dark:bg-blue-900'
-                      : 'bg-gray-100 dark:bg-gray-700'
-                  }`}
-                >
-                  <div className="font-medium mb-2">
-                    {message.role === 'user' ? 'You ' : 'BEST '}:
-                  </div>
-                  <div className="prose dark:prose-invert max-w-none whitespace-pre-wrap">
-                    {message.content.split('\n').map((line, i, lines) => {
-                      // Check for code blocks
-                      if (line.startsWith('```')) {
-                        const lang = line.slice(3).trim();
-                        const codeContent = [];
-                        let j = i + 1;
-                        
-                        // Collect all lines until closing ```
-                        while (j < lines.length && !lines[j].startsWith('```')) {
-                          codeContent.push(lines[j]);
-                          j++;
-                        }
-
-                        // Skip the lines we've processed
-                        i = j;
-                        
-                        // Only apply Prism highlighting to code blocks
-                        const code = codeContent.join('\n');
-                        const highlightedCode = lang && Prism.languages[lang] 
-                          ? Prism.highlight(code, Prism.languages[lang], lang)
-                          : code;
-                        
-                        return (
-                          <pre key={i} className="!bg-gray-800 !p-4 !rounded-lg overflow-x-auto">
-                            <code 
-                              className={`language-${lang}`}
-                              dangerouslySetInnerHTML={{ __html: highlightedCode }}
-                            />
-                          </pre>
-                        );
-                      }
-
-                      // Check for headers (# to ######)
-                      const headerMatch = line.match(/^(#{1,6})\s(.+)$/);
-                      if (headerMatch) {
-                        const level = headerMatch[1].length;
-                        const text = headerMatch[2];
-                        return (
-                          <div key={i} className={`text-${level === 1 ? '2xl' : level === 2 ? 'xl' : 'lg'} font-bold my-2`}>
-                            {text}
-                          </div>
-                        );
-                      }
-
-                      // Handle markdown formatting for normal text
-                      let formattedLine = line;
-                      // Handle bold text
-                      formattedLine = formattedLine.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-                      // Handle italic text
-                      formattedLine = formattedLine.replace(/\*(.*?)\*/g, '<em>$1</em>');
-                      // Handle inline code
-                      formattedLine = formattedLine.replace(/`([^`]+)`/g, '<code class="bg-gray-200 dark:bg-gray-700 px-1 py-0.5 rounded">$1</code>');
-                      
-                      return formattedLine ? (
-                        <div key={i} dangerouslySetInnerHTML={{ __html: formattedLine }} />
-                      ) : <br key={i} />;
-                    })}
+          <div className="max-w-3xl mx-auto w-full">
+            <div className="p-4 space-y-4 pb-32 h-full">
+              {messages.length === 0 ? (
+                <div className="flex flex-col items-center justify-center h-full min-h-[calc(100vh-200px)] text-center text-gray-600 dark:text-gray-300 space-y-4">
+                  <Image src="/favicon.ico" alt="BEST" width={128} height={128} className="mb-4" />
+                  <h3 className="text-xl font-semibold">Hey there! 👋</h3>
+                  <p className="text-lg">Get started with BEST</p>
+                  <div className="space-y-2">
+                    <p className="flex items-center justify-center space-x-2">
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                      </svg>
+                      <span><strong>B</strong>eyond</span>
+                    </p>
+                    <p className="flex items-center justify-center space-x-2">
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                      </svg>
+                      <span><strong>E</strong>fficient</span>
+                    </p>
+                    <p className="flex items-center justify-center space-x-2">
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                      </svg>
+                      <span><strong>S</strong>mart</span>
+                    </p>
+                    <p className="flex items-center justify-center space-x-2">
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.176 0l-3.976 2.888c-.783.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                      </svg>
+                      <span><strong>T</strong>echnology</span>
+                    </p>
                   </div>
                 </div>
-              ))}
-              {isLoading && (
-                <div className="flex justify-center">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+              ) : (
+                <div className="space-y-4">
+                  {messages.map((message, index) => (
+                    <div
+                      key={index}
+                      className={`p-4 rounded-2xl ${message.role === 'user'
+                        ? 'bg-blue-100 dark:bg-blue-900'
+                        : 'bg-gray-100 dark:bg-gray-700'
+                        }`}
+                    >
+                      <div className="font-medium mb-2">
+                        {message.role === 'user' ? 'You ' : 'BEST '}:
+                      </div>
+                      <div className="prose dark:prose-invert max-w-none whitespace-pre-wrap">
+                        {message.content.split('\n').map((line, i, lines) => {
+                          // Check for code blocks
+                          if (line.startsWith('```')) {
+                            const lang = line.slice(3).trim();
+                            const codeContent = [];
+                            let j = i + 1;
+
+                            // Collect all lines until closing ```
+                            while (j < lines.length && !lines[j].startsWith('```')) {
+                              codeContent.push(lines[j]);
+                              j++;
+                            }
+
+                            // Skip the lines we've processed
+                            i = j;
+
+                            // Only apply Prism highlighting to code blocks
+                            const code = codeContent.join('\n');
+                            const highlightedCode = lang && Prism.languages[lang]
+                              ? Prism.highlight(code, Prism.languages[lang], lang)
+                              : code;
+
+                            return (
+                              <pre key={i} className="!bg-gray-800 !p-4 !rounded-lg overflow-x-auto">
+                                <code
+                                  className={`language-${lang}`}
+                                  dangerouslySetInnerHTML={{ __html: highlightedCode }}
+                                />
+                              </pre>
+                            );
+                          }
+
+                          // Check for headers (# to ######)
+                          const headerMatch = line.match(/^(#{1,6})\s(.+)$/);
+                          if (headerMatch) {
+                            const level = headerMatch[1].length;
+                            const text = headerMatch[2];
+                            return (
+                              <div key={i} className={`text-${level === 1 ? '2xl' : level === 2 ? 'xl' : 'lg'} font-bold my-2`}>
+                                {text}
+                              </div>
+                            );
+                          }
+
+                          // Handle markdown formatting for normal text
+                          let formattedLine = line;
+                          // Handle bold text
+                          formattedLine = formattedLine.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+                          // Handle italic text
+                          formattedLine = formattedLine.replace(/\*(.*?)\*/g, '<em>$1</em>');
+                          // Handle inline code
+                          formattedLine = formattedLine.replace(/`([^`]+)`/g, '<code class="bg-gray-200 dark:bg-gray-700 px-1 py-0.5 rounded">$1</code>');
+
+                          return formattedLine ? (
+                            <div key={i} dangerouslySetInnerHTML={{ __html: formattedLine }} />
+                          ) : <br key={i} />;
+                        })}
+                      </div>
+                    </div>
+                  ))}
+                  {isLoading && (
+                    <div className="flex justify-center">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
-          )}
           </div>
-        </div>
 
-        <div className="sticky bottom-0 bg-white dark:bg-gray-900 p-4 border-t border-gray-200 dark:border-gray-700">
-          {uploadedFiles.length > 0 && (
-            <div className="mb-4 space-y-2">
-              {uploadedFiles.map((file, index) => (
-                <div key={index} className="flex items-center space-x-4 p-2 bg-gray-100 dark:bg-gray-800 rounded-lg">
-                  <div className="flex-shrink-0">
-                    <svg className="w-8 h-8 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                    </svg>
+          <div className={`sticky bottom-0 bg-white dark:bg-gray-900 p-4 ${!isSidebarVisible ? 'max-w-3xl mx-auto mb-4 rounded-2xl shadow-lg animate-bounce-subtle' : 'border-t border-gray-200 dark:border-gray-700'}`}>
+            {/* Horizontal file preview */}
+            {uploadedFiles.length > 0 && (
+              <div className="mb-4 flex flex-wrap gap-2">
+                {uploadedFiles.map((file, index) => (
+                  <div key={index} className="flex items-center space-x-2 p-2 bg-gray-100 dark:bg-gray-800 rounded-lg">
+                    <div className="flex-shrink-0">
+                      <svg className="w-5 h-5 text-gray-500 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                      </svg>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                        {file.name}
+                      </p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">
+                        {(file.size / 1024).toFixed(2)} KB
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => handleRemoveFile(index)}
+                      className="flex-shrink-0 text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
-                      {file.name}
-                    </p>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
-                      {(file.size / 1024).toFixed(2)} KB
-                    </p>
+                ))}
+              </div>
+            )}
+
+            {/* Redesigned input form with fixed-position icons */}
+            <div className="flex">
+              {/* File upload button on the left - fixed height */}
+              <div className="flex-shrink-0 self-start">
+                <label className="mr-2 cursor-pointer inline-flex items-center justify-center p-3 bg-gray-100 dark:bg-gray-800 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors" style={{ height: '44px', width: '44px' }}>
+                  <input
+                    type="file"
+                    className="hidden"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) handleFileUpload(file);
+                    }}
+                  />
+                  <svg className="w-5 h-5 text-gray-600 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                  </svg>
+                </label>
+              </div>
+
+              {/* Form with auto-growing text area and fixed send button */}
+              <form onSubmit={handleSubmit} className="flex-1 flex">
+                {/* Enhanced text area that grows */}
+                <div className="flex-1 relative">
+                  <textarea
+                    value={input}
+                    onChange={(e) => {
+                      setInput(e.target.value);
+                      // Auto-resize the textarea
+                      e.target.style.height = "44px"; // Reset to default height first
+                      // If content exists, grow based on content
+                      if (e.target.value) {
+                        e.target.style.height = Math.min(e.target.scrollHeight, 200) + "px";
+                      }
+                      // If empty, it will stay at the default 44px height
+                    }}
+                    onFocus={(e) => {
+                      // Ensure proper height when focused
+                      e.target.style.height = "44px";
+                      if (e.target.value) {
+                        e.target.style.height = Math.min(e.target.scrollHeight, 200) + "px";
+                      }
+                    }}
+                    placeholder="Type your message..."
+                    className="w-full p-3 bg-gray-100 dark:bg-gray-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none transition-all duration-200 ease-in-out shadow-sm hover:shadow-md"
+                    rows={1}
+                    style={{
+                      minHeight: '44px',
+                      maxHeight: '200px',
+                      overflow: 'auto',
+                      transition: 'height 0.2s ease-in-out, box-shadow 0.2s ease-in-out, background-color 0.2s ease-in-out'
+                    }}
+                  />
+                  <div className="absolute bottom-2 right-2 text-xs text-gray-400 pointer-events-none">
+                    {input.length > 0 && input.length}
                   </div>
+                </div>
+
+                {/* Send button on the right - fixed height */}
+                <div className="flex-shrink-0 self-start">
                   <button
-                    onClick={() => handleRemoveFile(index)}
-                    className="flex-shrink-0 text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300"
+                    type="submit"
+                    disabled={isLoading || (!input.trim() && uploadedFiles.length === 0)}
+                    className="ml-2 p-3 bg-blue-600 text-white rounded-lg hover:bg-blue-500 dark:hover:bg-blue-400 transition-all duration-300 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed transform hover:scale-105 active:scale-95"
+                    style={{ height: '44px', width: '44px' }}
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
                     </svg>
                   </button>
                 </div>
-              ))}
+              </form>
             </div>
-          )}
-
-          <form onSubmit={handleSubmit} className="flex space-x-4">
-            <div className="flex-1 relative">
-              <textarea
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                placeholder="Type your message..."
-                className="w-full p-3 bg-gray-100 dark:bg-gray-800 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
-                rows={1}
-                style={{ minHeight: '44px' }}
-              />
-            </div>
-            <div className="flex-shrink-0 flex space-x-2">
-              <label className="cursor-pointer inline-flex items-center justify-center p-3 bg-gray-100 dark:bg-gray-800 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">
-                <input
-                  type="file"
-                  className="hidden"
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (file) handleFileUpload(file);
-                  }}
-                />
-                <svg className="w-6 h-6 text-gray-600 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
-                </svg>
-              </label>
-              <button
-                type="submit"
-                disabled={isLoading || (!input.trim() && uploadedFiles.length === 0)}
-                className="p-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 dark:hover:bg-blue-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                </svg>
-              </button>
-            </div>
-          </form>
+          </div>
         </div>
       </main>
     </div>
