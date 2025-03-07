@@ -52,29 +52,8 @@ export default function Home() {
   // Theme management
   const [theme, setTheme] = useState<'light' | 'dark' | 'system'>('system');
 
-  // Initialize theme on component mount
-  useEffect(() => {
-    Prism.highlightAll();
-    const savedTheme = localStorage.getItem('theme');
-    if (savedTheme === 'light' || savedTheme === 'dark' || savedTheme === 'system') {
-      setTheme(savedTheme);
-    }
-    initializeTheme();
-
-    const loadChatSessions = async () => {
-      try {
-        const sessions = await chatDB.getAllSessions();
-        setChatSessions(sessions);
-      } catch (err) {
-        console.error('Failed to load chat sessions:', err);
-      }
-    };
-
-    loadChatSessions();
-  }, []);
-
   // Theme initialization function
-  const initializeTheme = () => {
+  const initializeTheme = useCallback(() => {
     const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
 
     if (theme === 'system') {
@@ -95,7 +74,27 @@ export default function Home() {
     return () => {
       mediaQuery.removeEventListener('change', handleThemeChange);
     };
-  };
+  }, [theme]);
+
+  useEffect(() => {
+    Prism.highlightAll();
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'light' || savedTheme === 'dark' || savedTheme === 'system') {
+      setTheme(savedTheme);
+    }
+    initializeTheme();
+
+    const loadChatSessions = async () => {
+      try {
+        const sessions = await chatDB.getAllSessions();
+        setChatSessions(sessions);
+      } catch (err) {
+        console.error('Failed to load chat sessions:', err);
+      }
+    };
+
+    loadChatSessions();
+  }, [initializeTheme]);
 
   // Theme toggle function
   const toggleTheme = () => {
@@ -261,7 +260,7 @@ export default function Home() {
 
     try {
       setUploadedFiles(prev => [...prev, file]);
-    } catch (error) {
+    } catch {
       console.error('Failed to process file');
     }
   };
