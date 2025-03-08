@@ -27,6 +27,18 @@ export default function Sidebar({
   const sidebarRef = useRef<HTMLDivElement>(null);
   const isResizing = useRef(false);
 
+  // Load sidebar state from localStorage on mount
+  useEffect(() => {
+    const storedVisibility = localStorage.getItem('sidebarVisible');
+    if (storedVisibility !== null && JSON.parse(storedVisibility) !== isVisible) {
+      onToggle();
+    }
+  }, []);
+
+  // Save sidebar state to localStorage when it changes
+  useEffect(() => {
+    localStorage.setItem('sidebarVisible', JSON.stringify(isVisible));
+  }, [isVisible]);
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
