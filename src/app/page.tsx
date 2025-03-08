@@ -354,63 +354,95 @@ export default function Home() {
                         {message.role === 'user' ? 'You ' : 'BEST '}:
                       </div>
                       <div className="prose dark:prose-invert max-w-none whitespace-pre-wrap">
-                        {message.content.split('\n').map((line, i, lines) => {
-                          // Check for code blocks
-                          if (line.startsWith('```')) {
-                            const lang = line.slice(3).trim();
-                            const codeContent = [];
-                            let j = i + 1;
+                        {(() => {
+                          const content = message.content;
+                          const formattedContent = [];
+                          let key = 0;
 
-                            // Collect all lines until closing ```
-                            while (j < lines.length && !lines[j].startsWith('```')) {
-                              codeContent.push(lines[j]);
-                              j++;
+                          // Split by code blocks first
+                          const parts = content.split(/(```[\s\S]*?```)/);
+
+                          for (let i = 0; i < parts.length; i++) {
+                            const part = parts[i];
+
+                            // Check if this part is a code block
+                            if (part.startsWith('```') && part.endsWith('```')) {
+                              // It's a code block
+                              const lines = part.split('\n');
+                              const langLine = lines[0];
+                              const lang = langLine.slice(3).trim();
+                              const codeContent = lines.slice(1, -1).join('\n');
+
+                              const highlightedCode = lang && Prism.languages[lang]
+                                ? Prism.highlight(codeContent, Prism.languages[lang], lang)
+                                : codeContent;
+
+                              formattedContent.push(
+                                <pre key={key++} className="!bg-gray-800 !p-4 !rounded-lg overflow-x-auto">
+                                  <code
+                                    className={`language-${lang}`}
+                                    dangerouslySetInnerHTML={{ __html: highlightedCode }}
+                                  />
+                                </pre>
+                              );
+                            } else if (part.trim()) {
+                              // It's regular text - process line by line
+                              const lines = part.split('\n');
+                              const textContent = [];
+
+                              for (let j = 0; j < lines.length; j++) {
+                                const line = lines[j];
+
+                                // Handle headers
+                                const headerMatch = line.match(/^(#{1,6})\s(.+)$/);
+                                if (headerMatch) {
+                                  const level = headerMatch[1].length;
+                                  const text = headerMatch[2];
+
+                                  // Instead of dynamic header tags, use className for styling
+                                  const headerClass = level === 1 ? 'text-2xl' :
+                                    level === 2 ? 'text-xl' :
+                                      level === 3 ? 'text-lg' :
+                                        level === 4 ? 'text-base font-bold' :
+                                          level === 5 ? 'text-sm font-bold' : 'text-xs font-bold';
+
+                                  textContent.push(
+                                    <div key={`h-${j}`} className={`${headerClass} font-bold my-2`}>
+                                      {text}
+                                    </div>
+                                  );
+                                  continue;
+                                }
+
+                                // Handle normal text with inline formatting
+                                let formattedLine = line;
+                                // Bold
+                                formattedLine = formattedLine.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+                                // Italic
+                                formattedLine = formattedLine.replace(/\*(.*?)\*/g, '<em>$1</em>');
+                                // Inline code
+                                formattedLine = formattedLine.replace(/`([^`]+)`/g, '<code class="bg-gray-200 dark:bg-gray-700 px-1 py-0.5 rounded">$1</code>');
+
+                                // Add line with proper handling of empty lines
+                                if (formattedLine) {
+                                  textContent.push(
+                                    <div key={`t-${j}`} dangerouslySetInnerHTML={{ __html: formattedLine }} />
+                                  );
+                                } else {
+                                  textContent.push(<br key={`br-${j}`} />);
+                                }
+                              }
+
+                              formattedContent.push(
+                                <div key={`text-${key++}`} className="space-y-1">
+                                  {textContent}
+                                </div>
+                              );
                             }
-
-                            // Skip the lines we've processed
-                            i = j;
-
-                            // Only apply Prism highlighting to code blocks
-                            const code = codeContent.join('\n');
-                            const highlightedCode = lang && Prism.languages[lang]
-                              ? Prism.highlight(code, Prism.languages[lang], lang)
-                              : code;
-
-                            return (
-                              <pre key={i} className="!bg-gray-800 !p-4 !rounded-lg overflow-x-auto">
-                                <code
-                                  className={`language-${lang}`}
-                                  dangerouslySetInnerHTML={{ __html: highlightedCode }}
-                                />
-                              </pre>
-                            );
                           }
 
-                          // Check for headers (# to ######)
-                          const headerMatch = line.match(/^(#{1,6})\s(.+)$/);
-                          if (headerMatch) {
-                            const level = headerMatch[1].length;
-                            const text = headerMatch[2];
-                            return (
-                              <div key={i} className={`text-${level === 1 ? '2xl' : level === 2 ? 'xl' : 'lg'} font-bold my-2`}>
-                                {text}
-                              </div>
-                            );
-                          }
-
-                          // Handle markdown formatting for normal text
-                          let formattedLine = line;
-                          // Handle bold text
-                          formattedLine = formattedLine.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-                          // Handle italic text
-                          formattedLine = formattedLine.replace(/\*(.*?)\*/g, '<em>$1</em>');
-                          // Handle inline code
-                          formattedLine = formattedLine.replace(/`([^`]+)`/g, '<code class="bg-gray-200 dark:bg-gray-700 px-1 py-0.5 rounded">$1</code>');
-
-                          return formattedLine ? (
-                            <div key={i} dangerouslySetInnerHTML={{ __html: formattedLine }} />
-                          ) : <br key={i} />;
-                        })}
+                          return formattedContent;
+                        })()}
                       </div>
                     </div>
                   ))}
